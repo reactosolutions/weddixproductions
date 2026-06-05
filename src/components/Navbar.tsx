@@ -1,8 +1,10 @@
 'use client'
 
 import Link from 'next/link'
+import Image from 'next/image'
 import { usePathname } from 'next/navigation'
 import { useState, useEffect } from 'react'
+import logoHorizontal from '@/images/logo/WEDDIX Logo-03.png'
 
 const links = [
   { href: '/', label: 'Home' },
@@ -32,11 +34,8 @@ export default function Navbar() {
       <header className="w-full bg-[#FAF7F5] border-b border-[#E8E0DC] relative z-40">
         <nav className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-12 h-[64px] md:h-[72px] flex items-center justify-between">
           {/* Logo */}
-          <Link
-            href="/"
-            className="font-serif text-2xl font-semibold text-[#8B1535] tracking-tight"
-          >
-            Weddiex
+          <Link href="/" className="flex items-center">
+            <Image src={logoHorizontal} alt="Weddix Wedding Productions" className="h-9 w-auto" />
           </Link>
 
           {/* Desktop nav */}

@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
 import Image from 'next/image'
-import { getContactPage } from '@/lib/db/sections'
+import { getContactPage, getSocialLinks } from '@/lib/db/sections'
 import ContactInfo from './ContactInfo'
 import ContactForm from './ContactForm'
 
@@ -10,7 +10,7 @@ export const metadata: Metadata = {
 }
 
 export default async function Page() {
-  const c = await getContactPage()
+  const [c, social] = await Promise.all([getContactPage(), getSocialLinks()])
   return (
     <div className="bg-white min-h-screen">
       <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-12">
@@ -45,7 +45,7 @@ export default async function Page() {
 
           {/* Right — contact info + form */}
           <div className="flex flex-col justify-center gap-12 pt-16 sm:pt-20 pb-16 sm:pb-24 lg:pl-14 border-l-0 lg:border-l border-[#E8E0DC]">
-            <ContactInfo whatsapp={c.whatsapp} location={c.location} availability={c.availability} />
+            <ContactInfo whatsapp={c.whatsapp} location={c.location} availability={c.availability} social={social} />
             <div className="border-t border-[#E8E0DC] pt-10">
               <ContactForm />
             </div>

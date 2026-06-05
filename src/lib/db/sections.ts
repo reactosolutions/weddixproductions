@@ -59,6 +59,14 @@ export type AboutPageContent = {
   cta_heading: string; cta_subtext: string; cta_label: string
 }
 
+export type SocialLinksContent = {
+  instagram: string
+  facebook: string
+  tiktok: string
+  pinterest: string
+  youtube: string
+}
+
 export type ContactPageContent = {
   heading: string; subtext: string
   whatsapp: string; location: string; availability: string
@@ -106,6 +114,10 @@ const ABOUT_PAGE_DEFAULTS: AboutPageContent = {
   cta_heading: 'Begin Your Story', cta_subtext: "Whether it's an intimate elopement or a grand celebration in Riyadh, let's create something unforgettable together.", cta_label: 'Schedule a Consultation',
 }
 
+const SOCIAL_LINKS_DEFAULTS: SocialLinksContent = {
+  instagram: '', facebook: '', tiktok: '', pinterest: '', youtube: '',
+}
+
 const CONTACT_PAGE_DEFAULTS: ContactPageContent = {
   heading: "Let's Create Something Beautiful", subtext: 'Every love story is a unique masterpiece. We are honoured to document yours with the elegance and artistry it deserves.',
   whatsapp: '905529841249', location: 'Based in Saudi Arabia', availability: 'Available Worldwide', image_url: '',
@@ -118,6 +130,7 @@ export const getHomeServices      = () => getSection('home_services',      HOME_
 export const getHomeAboutTeaser   = () => getSection('home_about_teaser',  HOME_ABOUT_TEASER_DEFAULTS)
 export const getServicesPage      = () => getSection('services_page',      SERVICES_PAGE_DEFAULTS)
 export const getAboutPage         = () => getSection('about_page',         ABOUT_PAGE_DEFAULTS)
+export const getSocialLinks        = () => getSection('social_links',        SOCIAL_LINKS_DEFAULTS)
 export const getContactPage       = () => getSection('contact_page',       CONTACT_PAGE_DEFAULTS)
 
 export const saveHomeServices     = (v: HomeServicesContent)     => saveSection('home_services',      v)
