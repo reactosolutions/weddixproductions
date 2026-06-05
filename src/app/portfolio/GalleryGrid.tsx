@@ -12,61 +12,75 @@ function getYouTubeId(url: string): string | null {
 }
 
 function MediaCell({ item }: { item: GalleryItem }) {
-  const isVideo = item.media_type === 'video'
-  const ytId    = isVideo && item.image_url ? getYouTubeId(item.image_url) : null
-  const thumb   = ytId ? `https://img.youtube.com/vi/${ytId}/hqdefault.jpg` : item.image_url
+  const isVideo  = (item.media_type ?? 'image') === 'video'
+  const isYT     = isVideo && !!item.image_url && (item.image_url.includes('youtube.com') || item.image_url.includes('youtu.be'))
+  const isDirect = isVideo && !!item.image_url && !isYT
+  const ytId     = isYT ? getYouTubeId(item.image_url!) : null
+  const ytThumb  = ytId ? `https://img.youtube.com/vi/${ytId}/hqdefault.jpg` : null
 
-  const inner = (
-    <div className={`relative ${item.aspect} overflow-hidden group cursor-pointer`}>
-      {thumb ? (
-        <Image
-          src={thumb}
-          alt={item.label}
-          fill
-          className="object-cover transition-transform duration-500 group-hover:scale-105"
-          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-        />
-      ) : (
-        <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 bg-[#D4C5BE]">
-          <svg width="28" height="28" viewBox="0 0 40 40" fill="none" className="opacity-30">
-            <rect x="2" y="8" width="36" height="26" rx="3" stroke="#8B1535" strokeWidth="1.5" />
-            <circle cx="20" cy="21" r="7" stroke="#8B1535" strokeWidth="1.5" />
-            <circle cx="20" cy="21" r="3" fill="#8B1535" fillOpacity="0.4" />
-            <rect x="14" y="4" width="12" height="6" rx="2" stroke="#8B1535" strokeWidth="1.5" />
-          </svg>
-          <span className="text-[10px] tracking-widest uppercase text-[#8B1535] opacity-40 text-center px-4">{item.label}</span>
-        </div>
-      )}
-      {/* Hover overlay */}
-      <div className="absolute inset-0 bg-[#2A1018]/0 group-hover:bg-[#2A1018]/20 transition-colors duration-300" />
-      {/* Video play icon */}
-      {isVideo && (
-        <div className="absolute inset-0 flex items-center justify-center">
-          <div className="w-12 h-12 rounded-full bg-black/40 group-hover:bg-black/60 border border-white/50 flex items-center justify-center transition-colors duration-300">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="white"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-          </div>
-        </div>
-      )}
-    </div>
-  )
-
-  if (isVideo && item.image_url && !thumb) {
+  // Direct video — silent autoplay preview
+  if (isDirect) {
     return (
-      <div className={`break-inside-avoid mb-4 ${item.aspect} overflow-hidden`}>
-        <video src={item.image_url} controls playsInline preload="metadata" className="w-full h-full object-cover" />
+      <div className={`break-inside-avoid mb-4 relative ${item.aspect} overflow-hidden group bg-[#D4C5BE]`}>
+        <video
+          src={item.image_url!}
+          autoPlay
+          muted
+          loop
+          playsInline
+          preload="auto"
+          className="absolute inset-0 w-full h-full object-cover"
+        />
+        <div className="absolute inset-0 bg-[#2A1018]/0 group-hover:bg-[#2A1018]/10 transition-colors duration-300" />
+        <div className="absolute top-3 right-3 w-8 h-8 rounded-full bg-black/40 flex items-center justify-center">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="white"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+        </div>
       </div>
     )
   }
 
-  if (isVideo && item.image_url) {
+  // YouTube video — thumbnail with link
+  if (isYT) {
     return (
-      <a href={item.image_url} target="_blank" rel="noopener noreferrer" className="break-inside-avoid mb-4 block">
-        {inner}
+      <a href={item.image_url!} target="_blank" rel="noopener noreferrer" className="break-inside-avoid mb-4 block">
+        <div className={`relative ${item.aspect} overflow-hidden group cursor-pointer`}>
+          {ytThumb ? (
+            <Image src={ytThumb} alt={item.label} fill className="object-cover transition-transform duration-500 group-hover:scale-105" sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw" />
+          ) : (
+            <div className="absolute inset-0 bg-[#D4C5BE]" />
+          )}
+          <div className="absolute inset-0 bg-[#2A1018]/0 group-hover:bg-[#2A1018]/20 transition-colors duration-300" />
+          <div className="absolute inset-0 flex items-center justify-center">
+            <div className="w-12 h-12 rounded-full bg-black/40 group-hover:bg-black/60 border border-white/50 flex items-center justify-center transition-colors duration-300">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="white"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+            </div>
+          </div>
+        </div>
       </a>
     )
   }
 
-  return <div className="break-inside-avoid mb-4">{inner}</div>
+  // Image
+  return (
+    <div className="break-inside-avoid mb-4">
+      <div className={`relative ${item.aspect} overflow-hidden group cursor-pointer`}>
+        {item.image_url ? (
+          <Image src={item.image_url} alt={item.label} fill className="object-cover transition-transform duration-500 group-hover:scale-105" sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw" />
+        ) : (
+          <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 bg-[#D4C5BE]">
+            <svg width="28" height="28" viewBox="0 0 40 40" fill="none" className="opacity-30">
+              <rect x="2" y="8" width="36" height="26" rx="3" stroke="#8B1535" strokeWidth="1.5" />
+              <circle cx="20" cy="21" r="7" stroke="#8B1535" strokeWidth="1.5" />
+              <circle cx="20" cy="21" r="3" fill="#8B1535" fillOpacity="0.4" />
+              <rect x="14" y="4" width="12" height="6" rx="2" stroke="#8B1535" strokeWidth="1.5" />
+            </svg>
+            <span className="text-[10px] tracking-widest uppercase text-[#8B1535] opacity-40 text-center px-4">{item.label}</span>
+          </div>
+        )}
+        <div className="absolute inset-0 bg-[#2A1018]/0 group-hover:bg-[#2A1018]/20 transition-colors duration-300" />
+      </div>
+    </div>
+  )
 }
 
 export default function GalleryGrid({ items }: { items: GalleryItem[] }) {
