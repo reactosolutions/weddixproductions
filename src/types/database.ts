@@ -3,6 +3,7 @@ export type GalleryItem = {
   category: string
   label: string
   image_url: string | null
+  media_type: 'image' | 'video'
   aspect: string       // e.g. 'aspect-[2/3]' | 'aspect-[3/2]' | 'aspect-square'
   featured: boolean
   display_order: number

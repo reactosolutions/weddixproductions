@@ -7,7 +7,7 @@ export async function getFeaturedGalleryItems(): Promise<GalleryItem[]> {
     .select('*')
     .eq('featured', true)
     .order('display_order', { ascending: true })
-    .limit(4)
+    .limit(10)
 
   if (error) throw new Error(error.message)
   return data ?? []
