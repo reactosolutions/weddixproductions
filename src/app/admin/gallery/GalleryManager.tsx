@@ -32,6 +32,7 @@ export default function GalleryManager({ initialItems }: { initialItems: Gallery
   const router      = useRouter()
   const supabase    = createClient()
   const fileRef     = useRef<HTMLInputElement>(null)
+  const videoRef    = useRef<HTMLInputElement>(null)
 
   const [items, setItems]         = useState(initialItems)
   const [form, setForm]           = useState(empty)
@@ -50,6 +51,20 @@ export default function GalleryManager({ initialItems }: { initialItems: Gallery
 
   function setMediaType(t: 'image' | 'video') {
     setForm((f) => ({ ...f, media_type: t, image_url: '' }))
+  }
+
+  async function handleVideoUpload(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0]
+    if (!file) return
+    setUploading(true)
+    const ext  = file.name.split('.').pop()
+    const path = `videos/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`
+    const { error } = await supabase.storage.from('gallery').upload(path, file, { upsert: true })
+    if (error) { flash(error.message); setUploading(false); return }
+    const { data } = supabase.storage.from('gallery').getPublicUrl(path)
+    setForm((f) => ({ ...f, image_url: data.publicUrl }))
+    setUploading(false)
+    flash('Video uploaded')
   }
 
   async function handleImageUpload(e: React.ChangeEvent<HTMLInputElement>) {
@@ -203,28 +218,31 @@ export default function GalleryManager({ initialItems }: { initialItems: Gallery
               <>
                 {/* Video preview */}
                 <div className="relative bg-[#D4C5BE] border border-[#E8E0DC] overflow-hidden" style={{ width: 160, height: 160 }}>
-                  {ytThumb ? (
-                    <Image src={ytThumb} alt="YouTube thumbnail" fill className="object-cover" sizes="160px" />
+                  {form.image_url ? (
+                    <video src={form.image_url} className="w-full h-full object-cover" muted playsInline />
                   ) : (
                     <div className="absolute inset-0 flex items-center justify-center"><VideoIcon /></div>
                   )}
-                  {(ytThumb || form.image_url) && (
-                    <div className="absolute inset-0 flex items-center justify-center">
+                  {form.image_url && (
+                    <div className="absolute inset-0 flex items-center justify-center bg-black/10">
                       <div className="w-10 h-10 rounded-full bg-black/40 flex items-center justify-center">
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="white"><polygon points="5 3 19 12 5 21 5 3"/></svg>
                       </div>
                     </div>
                   )}
                 </div>
-                <label className="block text-[10px] tracking-[0.15em] uppercase text-[#A8768A]">YouTube or Video URL</label>
-                <input
-                  type="url"
-                  value={form.image_url}
-                  onChange={(e) => setForm((f) => ({ ...f, image_url: e.target.value }))}
-                  placeholder="https://youtube.com/watch?v=…"
-                  className={inputCls}
-                  style={{ width: 160 }}
-                />
+                <input ref={videoRef} type="file" accept="video/mp4,video/quicktime,video/webm" className="hidden" onChange={handleVideoUpload} />
+                <button
+                  type="button"
+                  onClick={() => videoRef.current?.click()}
+                  disabled={uploading}
+                  className="border border-[#D4C5BE] text-xs text-[#5A3A44] px-3 h-8 hover:border-[#8B1535] hover:text-[#8B1535] transition-colors disabled:opacity-50 whitespace-nowrap"
+                >
+                  {uploading ? 'Uploading…' : form.image_url ? 'Change Video' : 'Upload Video'}
+                </button>
+                {form.image_url && (
+                  <button type="button" onClick={() => setForm((f) => ({ ...f, image_url: '' }))} className="text-xs text-red-400 hover:text-red-600">Remove</button>
+                )}
               </>
             )}
           </div>

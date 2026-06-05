@@ -50,6 +50,14 @@ function MediaCell({ item }: { item: GalleryItem }) {
     </div>
   )
 
+  if (isVideo && item.image_url && !thumb) {
+    return (
+      <div className={`break-inside-avoid mb-4 ${item.aspect} overflow-hidden`}>
+        <video src={item.image_url} controls playsInline preload="metadata" className="w-full h-full object-cover" />
+      </div>
+    )
+  }
+
   if (isVideo && item.image_url) {
     return (
       <a href={item.image_url} target="_blank" rel="noopener noreferrer" className="break-inside-avoid mb-4 block">
