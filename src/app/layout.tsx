@@ -20,6 +20,11 @@ const cormorant = Cormorant_Garamond({
 export const metadata: Metadata = {
   title: 'Weddiex — Fine Art Wedding Photography',
   description: 'A premier photography house dedicated to luxury weddings and editorial portraits.',
+  icons: {
+    icon: '/icon.png',
+    shortcut: '/icon.png',
+    apple: '/icon.png',
+  },
 }
 
 export default function RootLayout({
