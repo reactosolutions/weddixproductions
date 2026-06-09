@@ -28,17 +28,8 @@ export async function proxy(request: NextRequest) {
     },
   })
 
-  let user = null
-  try {
-    const { data } = await supabase.auth.getUser()
-    user = data.user
-  } catch {
-    // If auth check fails, allow login page but block other admin routes
-    if (pathname.startsWith('/admin') && pathname !== '/admin/login') {
-      return NextResponse.redirect(new URL('/admin/login', request.url))
-    }
-    return response
-  }
+  const authResult = await supabase.auth.getUser().catch(() => null)
+  const user = authResult?.data?.user ?? null
 
   // Protect all /admin routes except /admin/login
   if (pathname.startsWith('/admin') && pathname !== '/admin/login') {
