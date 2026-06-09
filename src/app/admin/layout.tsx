@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import AdminSidebar from './AdminSidebar'
 
+export const dynamic = 'force-dynamic'
 export const metadata: Metadata = { title: 'Admin — Weddiex' }
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
