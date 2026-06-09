@@ -3,6 +3,15 @@
 import { useState } from 'react'
 import type { Testimonial } from '@/types/database'
 
+function getInitials(name: string): string {
+  return name
+    .split(/[\s&]+/)
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((w) => w[0].toUpperCase())
+    .join('')
+}
+
 export default function Testimonials({ testimonials }: { testimonials: Testimonial[] }) {
   const [index, setIndex] = useState(0)
   const total = testimonials.length
@@ -28,15 +37,15 @@ export default function Testimonials({ testimonials }: { testimonials: Testimoni
           {visible.map((t, i) => (
             <div key={t.id ?? i} className="bg-white border border-[#EEE0E3] p-8 sm:p-10 flex flex-col gap-8">
               <blockquote className="font-serif text-lg sm:text-xl font-light text-[#2A1018] leading-8 italic flex-1">
-                &ldquo;{t.quote}&rdquo;
+                &ldquo;{t.content}&rdquo;
               </blockquote>
               <div className="flex items-center gap-4">
                 <div className="w-10 h-10 rounded-sm bg-[#8B1535] flex items-center justify-center text-white text-xs font-semibold tracking-wider shrink-0">
-                  {t.initials}
+                  {getInitials(t.client_name)}
                 </div>
                 <div>
                   <p className="text-sm font-semibold text-[#2A1018] tracking-wide">{t.client_name}</p>
-                  <p className="text-xs text-[#A8768A] mt-0.5">{t.detail}</p>
+                  <p className="text-xs text-[#A8768A] mt-0.5">{t.client_title}</p>
                 </div>
               </div>
             </div>

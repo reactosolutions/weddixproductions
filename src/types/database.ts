@@ -1,37 +1,41 @@
-export type GalleryItem = {
-  id: string
-  category: string
-  label: string
-  image_url: string | null
-  media_type: 'image' | 'video'
-  aspect: string       // e.g. 'aspect-[2/3]' | 'aspect-[3/2]' | 'aspect-square'
-  featured: boolean
-  display_order: number
-  created_at: string
+export type GalleryImage = {
+  id:          string
+  image_url:   string | null
+  caption:     string | null
+  category:    string
+  aspect:      string
+  media_type:  'image' | 'video'
+  featured:    boolean
+  order_index: number
+  is_active:   boolean
+  created_at:  string
+  updated_at:  string
 }
 
 export type Testimonial = {
-  id: string
-  quote: string
-  client_name: string
-  initials: string
-  detail: string
-  display_order: number
-  created_at: string
+  id:                string
+  client_name:       string
+  client_title:      string | null
+  client_avatar_url: string | null
+  content:           string
+  rating:            number | null
+  is_active:         boolean
+  created_at:        string
+  updated_at:        string
 }
 
 export type Database = {
   public: {
     Tables: {
-      gallery_items: {
-        Row: GalleryItem
-        Insert: Omit<GalleryItem, 'id' | 'created_at'>
-        Update: Partial<Omit<GalleryItem, 'id' | 'created_at'>>
+      gallery_images: {
+        Row:    GalleryImage
+        Insert: Omit<GalleryImage, 'id' | 'created_at' | 'updated_at'>
+        Update: Partial<Omit<GalleryImage, 'id' | 'created_at' | 'updated_at'>>
       }
       testimonials: {
-        Row: Testimonial
-        Insert: Omit<Testimonial, 'id' | 'created_at'>
-        Update: Partial<Omit<Testimonial, 'id' | 'created_at'>>
+        Row:    Testimonial
+        Insert: Omit<Testimonial, 'id' | 'created_at' | 'updated_at'>
+        Update: Partial<Omit<Testimonial, 'id' | 'created_at' | 'updated_at'>>
       }
     }
   }

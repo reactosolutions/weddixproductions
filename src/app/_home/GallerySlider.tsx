@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import Image from 'next/image'
-import type { GalleryItem } from '@/types/database'
+import type { GalleryImage } from '@/types/database'
 
 function getYouTubeId(url: string): string | null {
   const m = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&\n?#]+)/)
@@ -13,7 +13,7 @@ function isYouTube(url: string) {
   return url.includes('youtube.com') || url.includes('youtu.be')
 }
 
-export default function GallerySlider({ items }: { items: GalleryItem[] }) {
+export default function GallerySlider({ items }: { items: GalleryImage[] }) {
   const [current, setCurrent] = useState(0)
   const [paused, setPaused]   = useState(false)
 
@@ -60,7 +60,7 @@ export default function GallerySlider({ items }: { items: GalleryItem[] }) {
                 className="absolute inset-0 w-full h-full object-cover"
               />
             ) : thumb ? (
-              <Image src={thumb} alt={it.label} fill className="object-cover" sizes="100vw" priority={i === 0} />
+              <Image src={thumb} alt={it.caption ?? ''} fill className="object-cover" sizes="100vw" priority={i === 0} />
             ) : (
               <div className="absolute inset-0 bg-[#D4C5BE]" />
             )}
@@ -89,7 +89,7 @@ export default function GallerySlider({ items }: { items: GalleryItem[] }) {
       {/* Caption */}
       <div className="absolute bottom-12 sm:bottom-8 left-6 sm:left-10 pointer-events-none">
         <p className="text-[10px] tracking-[0.2em] uppercase text-white/70 mb-1">{item.category}</p>
-        <p className="font-serif text-xl sm:text-2xl font-light text-white drop-shadow">{item.label}</p>
+        <p className="font-serif text-xl sm:text-2xl font-light text-white drop-shadow">{item.caption ?? ''}</p>
       </div>
 
       {/* Arrows */}

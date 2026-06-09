@@ -74,6 +74,11 @@ export type ContactPageContent = {
   notification_email: string
 }
 
+export type FooterContent = {
+  tagline: string
+  copyright_name: string
+}
+
 // ── Defaults ──────────────────────────────────────────────────────────────────
 
 const HOME_SERVICES_DEFAULTS: HomeServicesContent = {
@@ -118,6 +123,11 @@ const SOCIAL_LINKS_DEFAULTS: SocialLinksContent = {
   instagram: '', facebook: '', tiktok: '', pinterest: '', youtube: '',
 }
 
+const FOOTER_DEFAULTS: FooterContent = {
+  tagline: 'A premier photography house dedicated to luxury weddings and editorial portraits.',
+  copyright_name: 'Weddix',
+}
+
 const CONTACT_PAGE_DEFAULTS: ContactPageContent = {
   heading: "Let's Create Something Beautiful", subtext: 'Every love story is a unique masterpiece. We are honoured to document yours with the elegance and artistry it deserves.',
   whatsapp: '905529841249', location: 'Based in Saudi Arabia', availability: 'Available Worldwide', image_url: '',
@@ -130,8 +140,9 @@ export const getHomeServices      = () => getSection('home_services',      HOME_
 export const getHomeAboutTeaser   = () => getSection('home_about_teaser',  HOME_ABOUT_TEASER_DEFAULTS)
 export const getServicesPage      = () => getSection('services_page',      SERVICES_PAGE_DEFAULTS)
 export const getAboutPage         = () => getSection('about_page',         ABOUT_PAGE_DEFAULTS)
-export const getSocialLinks        = () => getSection('social_links',        SOCIAL_LINKS_DEFAULTS)
+export const getSocialLinks       = () => getSection('social_links',       SOCIAL_LINKS_DEFAULTS)
 export const getContactPage       = () => getSection('contact_page',       CONTACT_PAGE_DEFAULTS)
+export const getFooter            = () => getSection('footer',             FOOTER_DEFAULTS)
 
 export const saveHomeServices     = (v: HomeServicesContent)     => saveSection('home_services',      v)
 export const saveHomeAboutTeaser  = (v: HomeAboutTeaserContent)  => saveSection('home_about_teaser',  v)

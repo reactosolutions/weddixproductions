@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/browser'
 import type { Testimonial } from '@/types/database'
 
-const empty = { quote: '', client_name: '', initials: '', detail: '', display_order: 0 }
+const empty = { content: '', client_name: '', client_title: '' }
 
 export default function TestimonialsManager({ initialItems }: { initialItems: Testimonial[] }) {
   const router   = useRouter()
@@ -23,11 +23,11 @@ export default function TestimonialsManager({ initialItems }: { initialItems: Te
   async function save() {
     setSaving(true)
     if (editing) {
-      const { error } = await supabase.from('testimonials').update({ ...form, display_order: Number(form.display_order) }).eq('id', editing)
-      if (!error) { flash('Saved'); setEditing(null); router.refresh() }
+      const { error } = await supabase.from('testimonials').update(form).eq('id', editing)
+      if (!error) { flash('Saved'); setEditing(null); setForm(empty); router.refresh() }
       else flash(error.message)
     } else {
-      const { error } = await supabase.from('testimonials').insert({ ...form, display_order: Number(form.display_order) })
+      const { error } = await supabase.from('testimonials').insert(form)
       if (!error) { flash('Added'); setForm(empty); router.refresh() }
       else flash(error.message)
     }
@@ -43,7 +43,7 @@ export default function TestimonialsManager({ initialItems }: { initialItems: Te
 
   function startEdit(item: Testimonial) {
     setEditing(item.id)
-    setForm({ quote: item.quote, client_name: item.client_name, initials: item.initials, detail: item.detail, display_order: item.display_order })
+    setForm({ content: item.content, client_name: item.client_name, client_title: item.client_title ?? '' })
   }
 
   const inputCls = 'border border-[#D4C5BE] bg-white px-3 py-2 text-sm text-[#2A1018] focus:outline-none focus:border-[#8B1535] transition-colors w-full'
@@ -58,32 +58,24 @@ export default function TestimonialsManager({ initialItems }: { initialItems: Te
         <div className="flex flex-col gap-4 mb-5">
           <div>
             <label className="block text-[10px] tracking-[0.15em] uppercase text-[#A8768A] mb-1">Quote</label>
-            <textarea rows={3} value={form.quote} onChange={set('quote')} placeholder="Client's words…" className={`${inputCls} resize-none`} />
+            <textarea rows={3} value={form.content} onChange={set('content')} placeholder="Client's words…" className={`${inputCls} resize-none`} />
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label className="block text-[10px] tracking-[0.15em] uppercase text-[#A8768A] mb-1">Client Name</label>
               <input type="text" value={form.client_name} onChange={set('client_name')} placeholder="Eleanor & Markus" className={inputCls} />
             </div>
             <div>
-              <label className="block text-[10px] tracking-[0.15em] uppercase text-[#A8768A] mb-1">Initials</label>
-              <input type="text" value={form.initials} onChange={set('initials')} placeholder="EM" maxLength={3} className={inputCls} />
+              <label className="block text-[10px] tracking-[0.15em] uppercase text-[#A8768A] mb-1">Detail (e.g. Tuscany, 2023)</label>
+              <input type="text" value={form.client_title} onChange={set('client_title')} placeholder="Tuscany, 2023" className={inputCls} />
             </div>
-            <div>
-              <label className="block text-[10px] tracking-[0.15em] uppercase text-[#A8768A] mb-1">Detail</label>
-              <input type="text" value={form.detail} onChange={set('detail')} placeholder="Tuscany, 2023" className={inputCls} />
-            </div>
-          </div>
-          <div className="w-32">
-            <label className="block text-[10px] tracking-[0.15em] uppercase text-[#A8768A] mb-1">Order</label>
-            <input type="number" value={form.display_order} onChange={set('display_order')} className={inputCls} />
           </div>
         </div>
 
         {msg && <p className="text-xs text-[#8B1535] mb-3">{msg}</p>}
 
         <div className="flex gap-3">
-          <button onClick={save} disabled={saving || !form.quote || !form.client_name}
+          <button onClick={save} disabled={saving || !form.content || !form.client_name}
             className="bg-[#8B1535] text-white text-xs font-semibold tracking-[0.15em] uppercase px-6 h-9 hover:bg-[#6E1028] transition-colors disabled:opacity-50">
             {saving ? 'Saving…' : editing ? 'Update' : 'Add'}
           </button>
@@ -101,7 +93,7 @@ export default function TestimonialsManager({ initialItems }: { initialItems: Te
         <table className="w-full text-sm">
           <thead className="border-b border-[#E8E0DC] bg-[#FAF7F5]">
             <tr>
-              {['Quote', 'Client', 'Detail', 'Order', ''].map((h) => (
+              {['Quote', 'Client', 'Detail', ''].map((h) => (
                 <th key={h} className="text-left px-4 py-3 text-[10px] font-semibold tracking-[0.15em] uppercase text-[#A8768A]">{h}</th>
               ))}
             </tr>
@@ -109,10 +101,9 @@ export default function TestimonialsManager({ initialItems }: { initialItems: Te
           <tbody>
             {items.map((item) => (
               <tr key={item.id} className="border-b border-[#F0E8E4] hover:bg-[#FAF7F5]">
-                <td className="px-4 py-3 text-[#2A1018] max-w-xs truncate">{item.quote}</td>
+                <td className="px-4 py-3 text-[#2A1018] max-w-xs truncate">{item.content}</td>
                 <td className="px-4 py-3 text-[#5A3A44] whitespace-nowrap">{item.client_name}</td>
-                <td className="px-4 py-3 text-[#A8768A] whitespace-nowrap">{item.detail}</td>
-                <td className="px-4 py-3 text-[#A8768A]">{item.display_order}</td>
+                <td className="px-4 py-3 text-[#A8768A] whitespace-nowrap">{item.client_title}</td>
                 <td className="px-4 py-3">
                   <div className="flex gap-3">
                     <button onClick={() => startEdit(item)} className="text-xs text-[#8B1535] hover:underline">Edit</button>
@@ -122,7 +113,7 @@ export default function TestimonialsManager({ initialItems }: { initialItems: Te
               </tr>
             ))}
             {items.length === 0 && (
-              <tr><td colSpan={5} className="px-4 py-8 text-center text-sm text-[#A8768A]">No testimonials yet.</td></tr>
+              <tr><td colSpan={4} className="px-4 py-8 text-center text-sm text-[#A8768A]">No testimonials yet.</td></tr>
             )}
           </tbody>
         </table>

@@ -4,9 +4,9 @@ import GalleryManager from './GalleryManager'
 export default async function AdminGalleryPage() {
   const supabase = await createClient()
   const { data: items } = await supabase
-    .from('gallery_items')
+    .from('gallery_images')
     .select('*')
-    .order('display_order', { ascending: true })
+    .order('order_index', { ascending: true })
 
   return (
     <div>

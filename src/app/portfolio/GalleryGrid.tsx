@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import Image from 'next/image'
-import type { GalleryItem } from '@/types/database'
+import type { GalleryImage } from '@/types/database'
 
 const tabs = ['All', 'Weddings', 'Graduations', 'Portraits', 'Family', 'Events', 'Lifestyle']
 
@@ -11,7 +11,7 @@ function getYouTubeId(url: string): string | null {
   return m ? m[1] : null
 }
 
-function MediaCell({ item }: { item: GalleryItem }) {
+function MediaCell({ item }: { item: GalleryImage }) {
   const isVideo  = (item.media_type ?? 'image') === 'video'
   const isYT     = isVideo && !!item.image_url && (item.image_url.includes('youtube.com') || item.image_url.includes('youtu.be'))
   const isDirect = isVideo && !!item.image_url && !isYT
@@ -45,7 +45,7 @@ function MediaCell({ item }: { item: GalleryItem }) {
       <a href={item.image_url!} target="_blank" rel="noopener noreferrer" className="break-inside-avoid mb-4 block">
         <div className={`relative ${item.aspect} overflow-hidden group cursor-pointer`}>
           {ytThumb ? (
-            <Image src={ytThumb} alt={item.label} fill className="object-cover transition-transform duration-500 group-hover:scale-105" sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw" />
+            <Image src={ytThumb} alt={item.caption} fill className="object-cover transition-transform duration-500 group-hover:scale-105" sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw" />
           ) : (
             <div className="absolute inset-0 bg-[#D4C5BE]" />
           )}
@@ -65,7 +65,7 @@ function MediaCell({ item }: { item: GalleryItem }) {
     <div className="break-inside-avoid mb-4">
       <div className={`relative ${item.aspect} overflow-hidden group cursor-pointer`}>
         {item.image_url ? (
-          <Image src={item.image_url} alt={item.label} fill className="object-cover transition-transform duration-500 group-hover:scale-105" sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw" />
+          <Image src={item.image_url} alt={item.caption} fill className="object-cover transition-transform duration-500 group-hover:scale-105" sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw" />
         ) : (
           <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 bg-[#D4C5BE]">
             <svg width="28" height="28" viewBox="0 0 40 40" fill="none" className="opacity-30">
@@ -74,7 +74,7 @@ function MediaCell({ item }: { item: GalleryItem }) {
               <circle cx="20" cy="21" r="3" fill="#8B1535" fillOpacity="0.4" />
               <rect x="14" y="4" width="12" height="6" rx="2" stroke="#8B1535" strokeWidth="1.5" />
             </svg>
-            <span className="text-[10px] tracking-widest uppercase text-[#8B1535] opacity-40 text-center px-4">{item.label}</span>
+            <span className="text-[10px] tracking-widest uppercase text-[#8B1535] opacity-40 text-center px-4">{item.caption}</span>
           </div>
         )}
         <div className="absolute inset-0 bg-[#2A1018]/0 group-hover:bg-[#2A1018]/20 transition-colors duration-300" />
@@ -83,7 +83,7 @@ function MediaCell({ item }: { item: GalleryItem }) {
   )
 }
 
-export default function GalleryGrid({ items }: { items: GalleryItem[] }) {
+export default function GalleryGrid({ items }: { items: GalleryImage[] }) {
   const [active, setActive] = useState('All')
   const visible = items.filter((p) => active === 'All' || p.category === active)
 

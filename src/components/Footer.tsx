@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import Image from 'next/image'
 import logoVerticalWhite from '@/images/logo/WEDDIX Logo-02.png'
-import { getSocialLinks } from '@/lib/db/sections'
+import { getSocialLinks, getFooter } from '@/lib/db/sections'
 import type { SocialLinksContent } from '@/lib/db/sections'
 
 const footerLinks = [
@@ -39,8 +39,9 @@ const socialIcons: { key: keyof SocialLinksContent; label: string; path: string 
 ]
 
 export default async function Footer() {
-  const social = await getSocialLinks()
+  const [social, footer] = await Promise.all([getSocialLinks(), getFooter()])
   const activeSocials = socialIcons.filter(({ key }) => !!social[key])
+  const year = new Date().getFullYear()
 
   return (
     <footer className="bg-[#8B1535] text-[#D9B8BF]">
@@ -51,7 +52,7 @@ export default async function Footer() {
           <div className="flex flex-col gap-5">
             <Image src={logoVerticalWhite} alt="Weddix Wedding Productions" className="w-28 h-auto" />
             <p className="text-sm leading-7 text-[#C4949F] max-w-sm">
-              Weddiex is a premier photography house dedicated to luxury weddings and editorial portraits.
+              {footer.tagline}
             </p>
             {activeSocials.length > 0 && (
               <div className="flex items-center gap-4">
@@ -95,7 +96,7 @@ export default async function Footer() {
 
         <div className="border-t border-[#A03050] pt-6 sm:pt-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4">
           <p className="text-xs text-[#A8606D]">
-            © 2026 Weddiex. Fine Art Wedding Photography.
+            © {year} {footer.copyright_name}. Fine Art Wedding Photography.
           </p>
           <p className="text-xs tracking-[0.18em] uppercase text-[#A8606D]">
             Crafted with Intention

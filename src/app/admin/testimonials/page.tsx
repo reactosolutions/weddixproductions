@@ -6,7 +6,7 @@ export default async function AdminTestimonialsPage() {
   const { data: items } = await supabase
     .from('testimonials')
     .select('*')
-    .order('display_order', { ascending: true })
+    .order('created_at', { ascending: true })
 
   return (
     <div>

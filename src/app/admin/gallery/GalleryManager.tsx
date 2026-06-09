@@ -4,14 +4,14 @@ import { useState, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import Image from 'next/image'
 import { createClient } from '@/lib/supabase/browser'
-import type { GalleryItem } from '@/types/database'
+import type { GalleryImage } from '@/types/database'
 
 const CATEGORIES = ['Weddings', 'Graduations', 'Portraits', 'Family', 'Events', 'Lifestyle']
 const ASPECTS    = ['aspect-[2/3]', 'aspect-[3/2]', 'aspect-square', 'aspect-[3/4]']
 
 const empty = {
-  category: 'Weddings', label: '', aspect: 'aspect-[2/3]',
-  featured: false, display_order: 0, image_url: '', media_type: 'image' as 'image' | 'video',
+  category: 'Weddings', caption: '', aspect: 'aspect-[2/3]',
+  featured: false, order_index: 0, image_url: '', media_type: 'image' as 'image' | 'video',
 }
 
 function getYouTubeId(url: string): string | null {
@@ -28,7 +28,7 @@ function VideoIcon() {
   )
 }
 
-export default function GalleryManager({ initialItems }: { initialItems: GalleryItem[] }) {
+export default function GalleryManager({ initialItems }: { initialItems: GalleryImage[] }) {
   const router      = useRouter()
   const supabase    = createClient()
   const fileRef     = useRef<HTMLInputElement>(null)
@@ -85,16 +85,16 @@ export default function GalleryManager({ initialItems }: { initialItems: Gallery
     setSaving(true)
     const payload = {
       ...form,
-      display_order: Number(form.display_order),
+      order_index: Number(form.order_index),
       image_url: form.image_url || null,
     }
 
     if (editing) {
-      const { error } = await supabase.from('gallery_items').update(payload).eq('id', editing)
+      const { error } = await supabase.from('gallery_images').update(payload).eq('id', editing)
       if (!error) { flash('Saved'); setEditing(null); setForm(empty); router.refresh() }
       else flash(error.message)
     } else {
-      const { error } = await supabase.from('gallery_items').insert(payload)
+      const { error } = await supabase.from('gallery_images').insert(payload)
       if (!error) { flash('Added'); setForm(empty); router.refresh() }
       else flash(error.message)
     }
@@ -103,16 +103,16 @@ export default function GalleryManager({ initialItems }: { initialItems: Gallery
 
   async function remove(id: string) {
     if (!confirm('Delete this item?')) return
-    await supabase.from('gallery_items').delete().eq('id', id)
+    await supabase.from('gallery_images').delete().eq('id', id)
     setItems((prev) => prev.filter((i) => i.id !== id))
     flash('Deleted')
   }
 
-  function startEdit(item: GalleryItem) {
+  function startEdit(item: GalleryImage) {
     setEditing(item.id)
     setForm({
-      category: item.category, label: item.label, aspect: item.aspect,
-      featured: item.featured, display_order: item.display_order,
+      category: item.category, caption: item.caption ?? '', aspect: item.aspect,
+      featured: item.featured, order_index: item.order_index,
       image_url: item.image_url ?? '',
       media_type: item.media_type ?? 'image',
     })
@@ -138,8 +138,8 @@ export default function GalleryManager({ initialItems }: { initialItems: Gallery
           {/* Fields */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="sm:col-span-2">
-              <label className="block text-[10px] tracking-[0.15em] uppercase text-[#A8768A] mb-1">Label / Alt Text</label>
-              <input type="text" value={form.label} onChange={set('label')} placeholder="Wedding couple portrait" className={inputCls} />
+              <label className="block text-[10px] tracking-[0.15em] uppercase text-[#A8768A] mb-1">Caption / Alt Text</label>
+              <input type="text" value={form.caption} onChange={set('caption')} placeholder="Wedding couple portrait" className={inputCls} />
             </div>
             <div>
               <label className="block text-[10px] tracking-[0.15em] uppercase text-[#A8768A] mb-1">Category</label>
@@ -155,7 +155,7 @@ export default function GalleryManager({ initialItems }: { initialItems: Gallery
             </div>
             <div>
               <label className="block text-[10px] tracking-[0.15em] uppercase text-[#A8768A] mb-1">Display Order</label>
-              <input type="number" value={form.display_order} onChange={set('display_order')} className={inputCls} />
+              <input type="number" value={form.order_index} onChange={set('order_index')} className={inputCls} />
             </div>
             <div className="flex items-end pb-1 gap-2">
               <input type="checkbox" id="featured" checked={form.featured} onChange={set('featured') as never} className="accent-[#8B1535] w-4 h-4" />
@@ -186,7 +186,6 @@ export default function GalleryManager({ initialItems }: { initialItems: Gallery
 
             {form.media_type === 'image' ? (
               <>
-                {/* Image preview */}
                 <div className="relative bg-[#D4C5BE] border border-[#E8E0DC] overflow-hidden" style={{ width: 160, height: 160 }}>
                   {form.image_url ? (
                     <Image src={form.image_url} alt="preview" fill className="object-cover" sizes="160px" />
@@ -216,7 +215,6 @@ export default function GalleryManager({ initialItems }: { initialItems: Gallery
               </>
             ) : (
               <>
-                {/* Video preview */}
                 <div className="relative bg-[#D4C5BE] border border-[#E8E0DC] overflow-hidden" style={{ width: 160, height: 160 }}>
                   {form.image_url ? (
                     <video src={form.image_url} className="w-full h-full object-cover" muted playsInline />
@@ -253,7 +251,7 @@ export default function GalleryManager({ initialItems }: { initialItems: Gallery
         <div className="flex gap-3 mt-5">
           <button
             onClick={save}
-            disabled={saving || !form.label}
+            disabled={saving}
             className="bg-[#8B1535] text-white text-xs font-semibold tracking-[0.15em] uppercase px-6 h-9 hover:bg-[#6E1028] transition-colors disabled:opacity-50"
           >
             {saving ? 'Saving…' : editing ? 'Update' : 'Add'}
@@ -271,7 +269,7 @@ export default function GalleryManager({ initialItems }: { initialItems: Gallery
         <table className="w-full text-sm">
           <thead className="border-b border-[#E8E0DC] bg-[#FAF7F5]">
             <tr>
-              {['Preview', 'Label', 'Type', 'Category', 'Featured', 'Order', ''].map((h) => (
+              {['Preview', 'Caption', 'Type', 'Category', 'Featured', 'Order', ''].map((h) => (
                 <th key={h} className="text-left px-4 py-3 text-[10px] font-semibold tracking-[0.15em] uppercase text-[#A8768A]">{h}</th>
               ))}
             </tr>
@@ -285,7 +283,7 @@ export default function GalleryManager({ initialItems }: { initialItems: Gallery
                   <td className="px-4 py-2">
                     <div className="relative w-12 h-12 bg-[#D4C5BE] overflow-hidden shrink-0">
                       {thumb ? (
-                        <Image src={thumb} alt={item.label} fill className="object-cover" sizes="48px" />
+                        <Image src={thumb} alt={item.caption ?? ''} fill className="object-cover" sizes="48px" />
                       ) : (
                         <div className="absolute inset-0 flex items-center justify-center opacity-40">
                           {isVideo
@@ -301,7 +299,7 @@ export default function GalleryManager({ initialItems }: { initialItems: Gallery
                       )}
                     </div>
                   </td>
-                  <td className="px-4 py-3 text-[#2A1018]">{item.label}</td>
+                  <td className="px-4 py-3 text-[#2A1018]">{item.caption}</td>
                   <td className="px-4 py-3">
                     <span className={`text-[10px] tracking-wide uppercase px-2 py-0.5 ${isVideo ? 'bg-[#FFF0F2] text-[#8B1535]' : 'bg-[#FAF7F5] text-[#A8768A]'}`}>
                       {item.media_type ?? 'image'}
@@ -311,7 +309,7 @@ export default function GalleryManager({ initialItems }: { initialItems: Gallery
                   <td className="px-4 py-3">
                     <span className={`inline-block w-2 h-2 rounded-full ${item.featured ? 'bg-[#8B1535]' : 'bg-[#D4C5BE]'}`} />
                   </td>
-                  <td className="px-4 py-3 text-[#A8768A]">{item.display_order}</td>
+                  <td className="px-4 py-3 text-[#A8768A]">{item.order_index}</td>
                   <td className="px-4 py-3">
                     <div className="flex gap-3">
                       <button onClick={() => startEdit(item)} className="text-xs text-[#8B1535] hover:underline">Edit</button>

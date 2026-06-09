@@ -1,34 +1,37 @@
 import { supabase } from '@/lib/supabase'
-import type { GalleryItem } from '@/types/database'
+import type { GalleryImage } from '@/types/database'
 
-export async function getFeaturedGalleryItems(): Promise<GalleryItem[]> {
+export async function getFeaturedGalleryItems(): Promise<GalleryImage[]> {
   const { data, error } = await supabase
-    .from('gallery_items')
+    .from('gallery_images')
     .select('*')
     .eq('featured', true)
-    .order('display_order', { ascending: true })
+    .eq('is_active', true)
+    .order('order_index', { ascending: true })
     .limit(10)
 
   if (error) throw new Error(error.message)
   return data ?? []
 }
 
-export async function getAllGalleryItems(): Promise<GalleryItem[]> {
+export async function getAllGalleryItems(): Promise<GalleryImage[]> {
   const { data, error } = await supabase
-    .from('gallery_items')
+    .from('gallery_images')
     .select('*')
-    .order('display_order', { ascending: true })
+    .eq('is_active', true)
+    .order('order_index', { ascending: true })
 
   if (error) throw new Error(error.message)
   return data ?? []
 }
 
-export async function getGalleryItemsByCategory(category: string): Promise<GalleryItem[]> {
+export async function getGalleryItemsByCategory(category: string): Promise<GalleryImage[]> {
   const { data, error } = await supabase
-    .from('gallery_items')
+    .from('gallery_images')
     .select('*')
     .eq('category', category)
-    .order('display_order', { ascending: true })
+    .eq('is_active', true)
+    .order('order_index', { ascending: true })
 
   if (error) throw new Error(error.message)
   return data ?? []

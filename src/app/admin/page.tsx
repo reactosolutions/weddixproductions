@@ -12,6 +12,7 @@ const sections = [
   { href: '/admin/gallery',       label: 'Gallery',           desc: 'Upload & manage photos' },
   { href: '/admin/testimonials',  label: 'Testimonials',      desc: 'Client reviews' },
   { href: '/admin/social',        label: 'Social Links',      desc: 'Instagram, TikTok, etc.' },
+  { href: '/admin/footer',        label: 'Footer',            desc: 'Tagline & copyright name' },
 ]
 
 function fmt(date: string) {
@@ -28,7 +29,7 @@ export default async function AdminDashboard() {
     { data: recentSubmissions },
     social,
   ] = await Promise.all([
-    supabase.from('gallery_items').select('*', { count: 'exact', head: true }),
+    supabase.from('gallery_images').select('*', { count: 'exact', head: true }),
     supabase.from('testimonials').select('*', { count: 'exact', head: true }),
     supabase.from('contact_submissions').select('*', { count: 'exact', head: true }),
     supabase.from('contact_submissions').select('name, email, service, source, created_at').order('created_at', { ascending: false }).limit(5),
