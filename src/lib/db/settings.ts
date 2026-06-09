@@ -37,16 +37,18 @@ const HERO_DEFAULTS: HeroContent = {
 }
 
 export async function getHeroContent(): Promise<HeroContent> {
-  const keys = Object.keys(HERO_DEFAULTS).map((k) => `hero_${k}`)
-  const { data } = await supabase
-    .from('site_settings')
-    .select('key, value')
-    .in('key', keys)
+  try {
+    const keys = Object.keys(HERO_DEFAULTS).map((k) => `hero_${k}`)
+    const { data } = await supabase
+      .from('site_settings')
+      .select('key, value')
+      .in('key', keys)
 
-  if (!data || data.length === 0) return HERO_DEFAULTS
+    if (!data || data.length === 0) return HERO_DEFAULTS
 
-  const map = Object.fromEntries(data.map(({ key, value }) => [key.replace('hero_', ''), value]))
-  return { ...HERO_DEFAULTS, ...map } as HeroContent
+    const map = Object.fromEntries(data.map(({ key, value }) => [key.replace('hero_', ''), value]))
+    return { ...HERO_DEFAULTS, ...map } as HeroContent
+  } catch { return HERO_DEFAULTS }
 }
 
 export async function saveHeroContent(content: HeroContent): Promise<void> {
