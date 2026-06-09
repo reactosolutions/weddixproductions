@@ -45,7 +45,7 @@ function MediaCell({ item }: { item: GalleryImage }) {
       <a href={item.image_url!} target="_blank" rel="noopener noreferrer" className="break-inside-avoid mb-4 block">
         <div className={`relative ${item.aspect} overflow-hidden group cursor-pointer`}>
           {ytThumb ? (
-            <Image src={ytThumb} alt={item.caption} fill className="object-cover transition-transform duration-500 group-hover:scale-105" sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw" />
+            <Image src={ytThumb} alt={item.caption ?? ''} fill className="object-cover transition-transform duration-500 group-hover:scale-105" sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw" />
           ) : (
             <div className="absolute inset-0 bg-[#D4C5BE]" />
           )}
@@ -65,7 +65,7 @@ function MediaCell({ item }: { item: GalleryImage }) {
     <div className="break-inside-avoid mb-4">
       <div className={`relative ${item.aspect} overflow-hidden group cursor-pointer`}>
         {item.image_url ? (
-          <Image src={item.image_url} alt={item.caption} fill className="object-cover transition-transform duration-500 group-hover:scale-105" sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw" />
+          <Image src={item.image_url} alt={item.caption ?? ''} fill className="object-cover transition-transform duration-500 group-hover:scale-105" sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw" />
         ) : (
           <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 bg-[#D4C5BE]">
             <svg width="28" height="28" viewBox="0 0 40 40" fill="none" className="opacity-30">
