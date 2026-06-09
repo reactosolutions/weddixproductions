@@ -17,6 +17,8 @@ const cormorant = Cormorant_Garamond({
   display: 'swap',
 })
 
+export const dynamic = 'force-dynamic'
+
 export const metadata: Metadata = {
   title: 'Weddiex — Fine Art Wedding Photography',
   description: 'A premier photography house dedicated to luxury weddings and editorial portraits.',
