@@ -3,10 +3,11 @@ import { supabase } from '@/lib/supabase'
 // ── Generic helper ────────────────────────────────────────────────────────────
 
 async function getSection<T>(key: string, defaults: T): Promise<T> {
-  const { data } = await supabase.from('site_settings').select('value').eq('key', key).single()
-  if (!data?.value) return defaults
-  try { return { ...defaults, ...JSON.parse(data.value) } as T }
-  catch { return defaults }
+  try {
+    const { data } = await supabase.from('site_settings').select('value').eq('key', key).single()
+    if (!data?.value) return defaults
+    return { ...defaults, ...JSON.parse(data.value) } as T
+  } catch { return defaults }
 }
 
 async function saveSection(key: string, value: unknown): Promise<void> {
