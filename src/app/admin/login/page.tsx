@@ -16,17 +16,22 @@ export default function AdminLoginPage() {
     setError('')
     setLoading(true)
 
-    const supabase = createClient()
-    const { error } = await supabase.auth.signInWithPassword({ email, password })
+    try {
+      const supabase = createClient()
+      const { error } = await supabase.auth.signInWithPassword({ email, password })
 
-    if (error) {
-      setError(error.message)
+      if (error) {
+        setError(error.message)
+        setLoading(false)
+        return
+      }
+
+      router.push('/admin')
+      router.refresh()
+    } catch {
+      setError('Connection failed. Check your internet and try again.')
       setLoading(false)
-      return
     }
-
-    router.push('/admin')
-    router.refresh()
   }
 
   const inputBase = 'w-full border border-[#D4C5BE] bg-white px-4 py-3 text-sm text-[#2A1018] placeholder:text-[#C4B4B8] focus:outline-none focus:border-[#8B1535] transition-colors'
